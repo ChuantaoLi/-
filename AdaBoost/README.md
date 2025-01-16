@@ -1,4 +1,4 @@
-AdaBoost.py：复现代码
+AdaBoost.py：二分类问题复现代码
 
 haberman_train.csv：训练集
 
