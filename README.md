@@ -12,6 +12,7 @@ AVG-AUC: 0.543915040183697
 G-MEAN: 0.4149889683565515
 
 Classification Report:
+
               precision    recall  f1-score   support
 
           -1       0.74      0.90      0.81        67
