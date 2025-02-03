@@ -3,6 +3,22 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score, classification_report
 
 
+def load_data(file_path):
+    """
+    加载数据文件，将数据和标签分别存储在两个列表中
+    :param file_path: 文件的路径
+    :return: 数据列表和标签列表
+    """
+    data = []
+    labels = []
+    with open(file_path, 'r') as f:
+        for line in f:
+            parts = line.strip().split(',')
+            data.append([float(x) for x in parts[:-1]])
+            labels.append(int(parts[-1]))
+    return np.array(data), np.array(labels)
+
+
 def stump_classify(data_matrix, dim, thresh_val, thresh_ineq):
     """
     基于单个特征和阈值对数据进行分类
@@ -126,22 +142,8 @@ def calculate_metrics(test_labels, predictions):
     return auc, g_mean
 
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-
-col_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'type']
-data = pd.read_csv("iris.csv", header=None, names=col_names)
-X = data.iloc[:, :-1].values
-Y = data.iloc[:, -1].values
-
-# 对 Y 进行标签编码
-label_encoder = LabelEncoder()
-Y_encoded = label_encoder.fit_transform(Y)
-
-train_data, test_data, train_labels, test_labels = train_test_split(X, Y_encoded, test_size=0.2, random_state=514)
-
-# train_data, train_labels = load_data("haberman_train.csv")
-# test_data, test_labels = load_data("haberman_test.csv")
+train_data, train_labels = load_data("haberman_train.csv")
+test_data, test_labels = load_data("haberman_test.csv")
 # 训练 AdaBoost 分类器
 classifier_list, alpha_list = ada_boost_train_ds(train_data, train_labels, 500)
 # 对测试集进行分类
@@ -149,11 +151,11 @@ predictions = ada_classify(test_data, classifier_list, alpha_list)
 # 计算准确率
 correct = np.sum(predictions == np.mat(test_labels).T)
 accuracy = correct / len(test_labels)
-print(f"Accuracy: {accuracy}")
+print(f"Accuracy: {accuracy:.4f}")
 # 计算 AVG-AUC、G-MEAN 和 RECALL
 auc, g_mean = calculate_metrics(test_labels, predictions)
-print(f"AVG-AUC: {auc}")
-print(f"G-MEAN: {g_mean}")
+print(f"AVG-AUC: {auc:.4f}")
+print(f"G-MEAN: {g_mean:.4f}")
 print("\nClassification Report:")
 predictions = pd.DataFrame(predictions)
-print(classification_report(test_labels, predictions))
+print(classification_report(test_labels, predictions, digits=4))
